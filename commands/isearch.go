@@ -53,7 +53,9 @@ func (c *ISearch) Help() string {
   Search for all interfaces in current and sub-directories
 
 Options:
-  filter	[-e exported]            Filter by exported interfaces
+  filter	     [-e exported] [-v verbose]                 Filters the output
+    -e only displays exported interfaces
+    -v verbose displays the interface's methods along with the name
 `
 }
 
