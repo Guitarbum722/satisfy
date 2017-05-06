@@ -10,25 +10,23 @@ import (
 	"regexp"
 )
 
-var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[_a-zA-Z]+)(\s)+interface`)
+var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[a-zA-Z_]+)(\s)+interface`)
 var ifaces = []IFace{}
 
-type IFacer interface {
-	Do()
-	While()
-}
+// ISearch provides commands to output a list of interfaces in the current directory tree
 type ISearch struct {
 	ifaces []IFace
 }
 
+// NewISearch returns a pointer to an ISearch
 func NewISearch() cli.CommandFactory {
 	return func() (cli.Command, error) {
 		return &ISearch{}, nil
 	}
 }
 
+// Run performs the isearch command with options
 func (c *ISearch) Run(args []string) int {
-
 	if len(args) < 1 {
 		allInterfaces()
 		return 0
@@ -36,17 +34,16 @@ func (c *ISearch) Run(args []string) int {
 	switch args[0] {
 	case "filter":
 		if len(args) == 2 {
-			// add a function to filter
-			allInterfaces()
-			return 0
+			switch args[1] {
+			case "-e":
+				exportedInterfaces()
+				return 0
+			}
 		}
 		allInterfaces()
-		return 0
 	default:
 		fmt.Println("INVALID SUBCOMMAND for isearch")
-		return 1
 	}
-
 	return 0
 }
 
@@ -56,7 +53,7 @@ func (c *ISearch) Help() string {
   Search for all interfaces in current and sub-directories
 
 Options:
-  filter	[prefix]      Filter results by provided prefix
+  filter	[-e exported]            Filter by exported interfaces
 `
 }
 
@@ -66,16 +63,28 @@ func (c *ISearch) Synopsis() string {
 }
 
 func allInterfaces() {
-	ifaces, err := searchInterfaces("")
+	ifaces, err := searchInterfaces(false)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	display(ifaces)
+}
+
+func exportedInterfaces() {
+	ifaces, err := searchInterfaces(true)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	display(ifaces)
+}
+
+func display(ifaces []IFace) {
 	for _, v := range ifaces {
 		fmt.Printf("Interface Name: %s - %s\n", v.name, v.containingFile)
 	}
 }
 
-func searchInterfaces(prefix string) ([]IFace, error) {
+func searchInterfaces(exported bool) ([]IFace, error) {
 	files := []string{}
 	var ifaces []IFace
 	err := filepath.Walk(".", func(path string, f os.FileInfo, err error) error {
@@ -112,15 +121,18 @@ func searchInterfaces(prefix string) ([]IFace, error) {
 						iface.name = matches[i]
 					}
 				}
-				ifaces = append(ifaces, iface)
+				switch exported {
+				case true:
+					if iface.name[0] >= 'A' && iface.name[0] <= 'Z' {
+						ifaces = append(ifaces, iface)
+					}
+				default:
+					ifaces = append(ifaces, iface)
+
+				}
 			}
 		}
 		f.Close()
 	}
-	// if prefix == "" {
-
-	// 	return nil, nil
-	// }
-	// fmt.Println(is.ifaces)
 	return ifaces, nil
 }
