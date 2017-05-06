@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/mitchellh/cli"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 )
 
 var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[_a-zA-Z]+)(\s)+interface`)
+var ifaces = []IFace{}
 
 type IFacer interface {
 	Do()
@@ -26,14 +28,23 @@ func NewISearch() cli.CommandFactory {
 }
 
 func (c *ISearch) Run(args []string) int {
-	fmt.Println(len(args))
+
 	if len(args) < 1 {
-		searchInterfaces(c, "")
+		allInterfaces()
 		return 0
 	}
 	switch args[0] {
 	case "filter":
-		searchInterfaces(c, "")
+		if len(args) == 2 {
+			// add a function to filter
+			allInterfaces()
+			return 0
+		}
+		allInterfaces()
+		return 0
+	default:
+		fmt.Println("INVALID SUBCOMMAND for isearch")
+		return 1
 	}
 
 	return 0
@@ -54,8 +65,19 @@ func (c *ISearch) Synopsis() string {
 	return "Search interfaces in package"
 }
 
-func searchInterfaces(is *ISearch, prefix string) ([]IFace, error) {
+func allInterfaces() {
+	ifaces, err := searchInterfaces("")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for _, v := range ifaces {
+		fmt.Printf("Interface Name: %s - %s\n", v.name, v.containingFile)
+	}
+}
+
+func searchInterfaces(prefix string) ([]IFace, error) {
 	files := []string{}
+	var ifaces []IFace
 	err := filepath.Walk(".", func(path string, f os.FileInfo, err error) error {
 		files = append(files, path)
 		return nil
@@ -90,7 +112,7 @@ func searchInterfaces(is *ISearch, prefix string) ([]IFace, error) {
 						iface.name = matches[i]
 					}
 				}
-				is.ifaces = append(is.ifaces, iface)
+				ifaces = append(ifaces, iface)
 			}
 		}
 		f.Close()
@@ -99,6 +121,6 @@ func searchInterfaces(is *ISearch, prefix string) ([]IFace, error) {
 
 	// 	return nil, nil
 	// }
-	fmt.Println(is.ifaces)
-	return nil, nil
+	// fmt.Println(is.ifaces)
+	return ifaces, nil
 }

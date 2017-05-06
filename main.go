@@ -7,6 +7,9 @@ import (
 	"os"
 )
 
+type sampler interface {
+}
+
 const (
 	satisfyVersion = "0.0.1"
 	satisfyName    = "satisfy"
