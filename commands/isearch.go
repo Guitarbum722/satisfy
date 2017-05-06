@@ -13,20 +13,19 @@ import (
 var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[a-zA-Z_]+)(\s)+interface`)
 var ifaces = []IFace{}
 
-type IFacer interface {
-	Do()
-	While()
-}
+// ISearch provides commands to output a list of interfaces in the current directory tree
 type ISearch struct {
 	ifaces []IFace
 }
 
+// NewISearch returns a pointer to an ISearch
 func NewISearch() cli.CommandFactory {
 	return func() (cli.Command, error) {
 		return &ISearch{}, nil
 	}
 }
 
+// Run performs the isearch command with options
 func (c *ISearch) Run(args []string) int {
 	if len(args) < 1 {
 		allInterfaces()
