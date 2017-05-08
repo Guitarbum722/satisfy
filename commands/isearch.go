@@ -11,8 +11,9 @@ import (
 	"strings"
 )
 
-var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[a-zA-Z_]+)(\s)+interface`)
+var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[a-zA-Z1-9_]+)(\s)+interface`)
 var ifaces = []IFace{}
+var tempMethods = make(map[string][]string)
 
 // ISearch provides commands to output a list of interfaces in the current directory tree
 type ISearch struct {
@@ -29,7 +30,7 @@ func NewISearch() cli.CommandFactory {
 // Run performs the isearch command with options
 func (c *ISearch) Run(args []string) int {
 	if len(args) < 1 {
-		allInterfaces()
+		allInterfaces(true)
 		return 0
 	}
 	switch args[0] {
@@ -37,11 +38,14 @@ func (c *ISearch) Run(args []string) int {
 		if len(args) == 2 {
 			switch args[1] {
 			case "-e":
-				exportedInterfaces()
+				exportedInterfaces(false)
+				return 0
+			case "-v":
+				allInterfaces(true)
 				return 0
 			}
 		}
-		allInterfaces()
+		allInterfaces(false)
 	default:
 		fmt.Println("INVALID SUBCOMMAND for isearch")
 	}
@@ -65,32 +69,47 @@ func (c *ISearch) Synopsis() string {
 	return "Search interfaces in package"
 }
 
-func allInterfaces() {
+func allInterfaces(verbose bool) {
 	ifaces, err := searchInterfaces(false)
+
 	if err != nil {
 		log.Fatalln(err)
 	}
-	display(ifaces)
+
+	for i := range ifaces {
+		ifaces[i].methods = append(ifaces[i].methods, tempMethods[ifaces[i].name]...)
+	}
+
+	display(ifaces, verbose)
 }
 
-func exportedInterfaces() {
+func exportedInterfaces(verbose bool) {
 	ifaces, err := searchInterfaces(true)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	display(ifaces)
+
+	for i := range ifaces {
+		ifaces[i].methods = append(ifaces[i].methods, tempMethods[ifaces[i].name]...)
+	}
+
+	display(ifaces, verbose)
 }
 
-func display(ifaces []IFace) {
+func display(ifaces []IFace, verbose bool) {
 	for _, v := range ifaces {
 		fmt.Printf("Interface Name: %s - %s\n", v.name, v.containingFile)
+		if verbose {
+			for _, m := range v.methods {
+				fmt.Println(m)
+			}
+		}
 	}
 }
 
 func searchInterfaces(exported bool) ([]IFace, error) {
 	files := []string{}
 	var ifaces []IFace
-	var tempMethods = make(map[string][]string)
 
 	err := filepath.Walk(".", func(path string, f os.FileInfo, err error) error {
 		files = append(files, path)
@@ -117,11 +136,11 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 
 			if ifaceFound && line[0] == '}' {
 				ifaceFound = false
+				tempName = ""
 				continue
 			}
 			if ifaceFound {
 				tempMethods[tempName] = append(tempMethods[tempName], line)
-				tempName = ""
 			}
 
 			matched := regex.FindStringSubmatch(line)
@@ -155,11 +174,6 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 		}
 		f.Close()
 	}
-	for k := range tempMethods {
-		fmt.Printf("%v :::\n", k)
-		for _, v := range tempMethods[k] {
-			fmt.Println(v)
-		}
-	}
+
 	return ifaces, nil
 }
