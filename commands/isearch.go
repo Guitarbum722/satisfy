@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[a-zA-Z_]+)(\s)+interface`)
@@ -89,6 +90,8 @@ func display(ifaces []IFace) {
 func searchInterfaces(exported bool) ([]IFace, error) {
 	files := []string{}
 	var ifaces []IFace
+	var tempMethods = make(map[string][]string)
+
 	err := filepath.Walk(".", func(path string, f os.FileInfo, err error) error {
 		files = append(files, path)
 		return nil
@@ -96,20 +99,35 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	for _, file := range files {
+		// only necessary to scan .go files
+		if !strings.HasSuffix(file, ".go") {
+			continue
+		}
+
 		f, err := os.Open(file)
 		if err != nil {
 			return nil, err
 		}
 		scanner := bufio.NewScanner(f)
-
+		var ifaceFound bool
+		var tempName string
 		for scanner.Scan() {
 			line := scanner.Text()
 
-			matches := regex.FindStringSubmatch(line)
+			if ifaceFound && line[0] == '}' {
+				ifaceFound = false
+				continue
+			}
+			if ifaceFound {
+				tempMethods[tempName] = append(tempMethods[tempName], line)
+				tempName = ""
+			}
 
-			if matches != nil {
+			matched := regex.FindStringSubmatch(line)
+
+			if matched != nil {
+				ifaceFound = true
 				iface := IFace{}
 				iface.containingFile = file
 
@@ -120,7 +138,8 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 
 					switch n {
 					case "iface":
-						iface.name = matches[i]
+						iface.name = matched[i]
+						tempName = iface.name
 					}
 				}
 				switch exported {
@@ -135,6 +154,12 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 			}
 		}
 		f.Close()
+	}
+	for k := range tempMethods {
+		fmt.Printf("%v :::\n", k)
+		for _, v := range tempMethods[k] {
+			fmt.Println(v)
+		}
 	}
 	return ifaces, nil
 }
