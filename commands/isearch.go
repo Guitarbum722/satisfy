@@ -101,7 +101,7 @@ func display(ifaces []IFace, verbose bool) {
 		fmt.Printf("Interface Name: %s - %s\n", v.name, v.containingFile)
 		if verbose {
 			for _, m := range v.methods {
-				fmt.Println(m)
+				fmt.Printf("\t%s\n", m)
 			}
 		}
 	}
@@ -140,6 +140,7 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 				continue
 			}
 			if ifaceFound {
+				line = strings.TrimLeft(line, "\t")
 				tempMethods[tempName] = append(tempMethods[tempName], line)
 			}
 
