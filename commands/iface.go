@@ -6,3 +6,13 @@ type IFace struct {
 	containingFile string
 	methods        []string
 }
+
+// Contains Checks to see if the []IFace contains the iface
+func Contains(ifaces []IFace, name string) bool {
+	for _, v := range ifaces {
+		if v.name == name {
+			return true
+		}
+	}
+	return false
+}
