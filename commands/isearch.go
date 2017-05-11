@@ -12,13 +12,11 @@ import (
 )
 
 var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[a-zA-Z1-9_]+)(\s)+interface`)
-var ifaces = []IFace{}
+
 var tempMethods = make(map[string][]string)
 
 // ISearch provides commands to output a list of interfaces in the current directory tree
-type ISearch struct {
-	ifaces []IFace
-}
+type ISearch struct{}
 
 // NewISearch returns a pointer to an ISearch
 func NewISearch() cli.CommandFactory {
