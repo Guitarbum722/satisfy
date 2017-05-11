@@ -8,11 +8,11 @@ type IFace struct {
 }
 
 // Contains Checks to see if the []IFace contains the iface
-func Contains(ifaces []IFace, name string) bool {
+func Contains(ifaces []IFace, name string) ([]string, bool) {
 	for _, v := range ifaces {
 		if v.name == name {
-			return true
+			return v.methods, true
 		}
 	}
-	return false
+	return nil, false
 }
