@@ -27,7 +27,8 @@ func run() (int, error) {
 		Args:     os.Args[1:],
 		HelpFunc: cli.BasicHelpFunc(satisfyName),
 		Commands: map[string]cli.CommandFactory{
-			"isearch": commands.NewISearch(),
+			"isearch":   commands.NewISearch(),
+			"implement": commands.NewImplement(),
 		},
 	}
 
