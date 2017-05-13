@@ -2,9 +2,9 @@ package commands
 
 // IFace represents a Go Interface which has a containing file
 type IFace struct {
-	name           string
-	containingFile string
-	methods        []string
+	name           string   // name of the interface
+	containingFile string   // file that contains the interface
+	methods        []string // the methods of the interface
 }
 
 // Contains Checks to see if the []IFace contains the iface
