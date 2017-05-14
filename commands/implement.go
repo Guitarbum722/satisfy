@@ -74,7 +74,7 @@ func (%s %s%s) %s {
 
 // Help returns a description of the command and the options
 func (i *Implement) Help() string {
-	return `Usage: satisfy implement <interface-name>  <option> <type>, [<option> <type>...]
+	return `Usage: satisfy implement <interface-name>  [<option>] <type>, [<option> <type>...]
   Implement the methods of the types for the interface provided
 
 Options:
