@@ -40,15 +40,32 @@ func (i *Implement) Run(args []string) int {
 	}
 
 	funcTemplate := `
-func (%s %s) %s {
+func (%s %s%s) %s {
 
 }
 
 `
-	// TODO(guitarbum722) provide a flag so that the receiver can be a pointer to the type 2017-05-10T18:30 4
-	for _, arg := range args[1:] {
+	// output the signature for each method, while making the receiver type a pointer if applicable
+	isPointer := false
+
+	for _, v := range args[1:] {
+		switch v {
+		case "-p":
+			isPointer = !isPointer
+			continue
+		case "-v":
+			isPointer = !isPointer
+			continue
+		}
+
+		if !isPointer {
+			for i := range methods {
+				fmt.Printf(funcTemplate, strings.ToLower(string(v[0])), "", v, methods[i])
+			}
+			continue
+		}
 		for i := range methods {
-			fmt.Printf(funcTemplate, strings.ToLower(string(arg[0])), arg, methods[i])
+			fmt.Printf(funcTemplate, strings.ToLower(string(v[0])), "*", v, methods[i])
 		}
 	}
 
@@ -57,10 +74,18 @@ func (%s %s) %s {
 
 // Help returns a description of the command and the options
 func (i *Implement) Help() string {
-	return `Usage: satisfy implement <interface-name> <type>, [<type>...]
+	return `Usage: satisfy implement <interface-name>  <option> <type>, [<option> <type>...]
   Implement the methods of the types for the interface provided
 
 Options:
+  -p           Implement method signatures with pointer receivers
+                 This flag will apply for all items in the argument list until
+                 the "-v" flag is used in the argument list
+  -v           Implement method signatures with value receivers
+                 This flag will apply for all items in the argument list until
+                 the "-p" flag is used in the argument list
+Example:
+  $ satisfy implement CoolInterface -p CoolStruct CoolerStruct -v AwesomeStruct
 `
 }
 
