@@ -3,6 +3,8 @@
 > Satisfy is a CLI tool that will allow the user to satisfy an interface/s of their choice
 by generating code that implements its methods.
 
+_**Special thanks to [Brian Downs](https://github.com/briandowns) - "satisfy" is heavily influenced by his tool, [TODO-VIEW](https://github.com/briandowns/todo-view) in terms of design.**_ 
+
 ### Basic usage
 
 **Searching interfaces**
@@ -107,3 +109,7 @@ func (c *struct4) kick() {
 
 }
 ```
+
+### Contributions
+Contributions are welcome!
+If you have any ideas regarding additional functionality, or want to improve something, please fork and open a pull request.  That would be awesome!
