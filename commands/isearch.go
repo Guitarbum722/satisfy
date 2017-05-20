@@ -94,6 +94,7 @@ func exportedInterfaces(verbose bool) {
 	display(ifaces, verbose)
 }
 
+// TODO(guitarbum722) pretty the output so that it is at least aligned nicely 2017-05-19T18:00 2
 func display(ifaces []IFace, verbose bool) {
 	for _, v := range ifaces {
 		fmt.Printf("Interface Name: %s - %s\n", v.name, v.containingFile)
@@ -132,7 +133,8 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 		for scanner.Scan() {
 			line := scanner.Text()
 
-			if ifaceFound && line[0] == '}' {
+			// account for an interface with NO methods which might have the opening and closing brace on same line
+			if ifaceFound && (line == "" || line[0] == '}') {
 				ifaceFound = false
 				tempName = ""
 				continue
@@ -171,6 +173,7 @@ func searchInterfaces(exported bool) ([]IFace, error) {
 				}
 			}
 		}
+
 		f.Close()
 	}
 
