@@ -13,29 +13,36 @@ Search all interfaces in current tree and display their names, methods, and cont
 ```sh
 $ satisfy isearch
 
-Interface Name: IFacer2 - commands/sampler2.go
-        Do2(n int, s []string) error
-        While2(s string) (string, error)
-Interface Name: sampler - sampler.go
-        punch()
-        kick()
+Interface       Containing File                 Methods
+
+IFacer2         commands/isearch_test.go
+                                                Do2(n int, s []string) error
+                                                While2(s string) (string, error)
+sampler2        commands/isearch_test.go
+                                                punch2() error
+                                                kick2() string
 ```
 
 Search interfaces in current tree and only display exported interfaces
 ```sh
 $ satisfy isearch filter -e
 
-Interface Name: IFacer2 - commands/sampler2.go
+Interface       Containing File
+
+IFacer2         commands/isearch_test.go
+Cooler          commands/isearch_test.go
+Heater          commands/isearch_test.go
+IFacer          sampler.go
 ```
 
 Search all interfaces but do not display methods
 ```sh
 $ satisfy isearch filter
 
-Interface Name: IFacer2 - commands/sampler2.go
-Interface Name: sampler2 - commands/sampler2.go
-Interface Name: IFacer - sampler.go
-Interface Name: sampler - sampler.go
+Interface       Containing File
+
+IFacer2         commands/isearch_test.go
+sampler2        commands/isearch_test.go
 ```
 
 **Generate method signatures**
