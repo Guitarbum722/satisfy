@@ -100,7 +100,9 @@ func display(ifaces []IFace, verbose bool) {
 
 	switch verbose {
 	case true:
-		fmt.Fprintf(w, "Interface\tContaining File\tMethods\n\n")
+		fmt.Fprintf(w, "Interface\tContaining File\tMethods\n")
+		fmt.Fprintf(w, "\t\t\n")
+
 		for _, v := range ifaces {
 			fmt.Fprintf(w, "%s\t%s\t\n", v.name, v.containingFile)
 			for _, m := range v.methods {
@@ -108,9 +110,11 @@ func display(ifaces []IFace, verbose bool) {
 			}
 		}
 	case false:
-		fmt.Fprintf(w, "Interface\tContaining File\n\n")
+		fmt.Fprintf(w, "Interface\tContaining File\n")
+		fmt.Fprintf(w, "\t\n")
+
 		for _, v := range ifaces {
-			fmt.Fprintf(w, "%s\t%s\t\n", v.name, v.containingFile)
+			fmt.Fprintf(w, "%s\t%s\n", v.name, v.containingFile)
 		}
 	}
 	w.Flush()
