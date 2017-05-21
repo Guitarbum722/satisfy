@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"text/tabwriter"
 )
 
 var regex = regexp.MustCompile(`^type(\s)+(?P<iface>[a-zA-Z1-9_]+)(\s)+interface`)
@@ -94,16 +95,25 @@ func exportedInterfaces(verbose bool) {
 	display(ifaces, verbose)
 }
 
-// TODO(guitarbum722) pretty the output so that it is at least aligned nicely 2017-05-19T18:00 2
 func display(ifaces []IFace, verbose bool) {
-	for _, v := range ifaces {
-		fmt.Printf("Interface Name: %s - %s\n", v.name, v.containingFile)
-		if verbose {
+	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
+
+	switch verbose {
+	case true:
+		fmt.Fprintf(w, "Interface\tContaining File\tMethods\n\n")
+		for _, v := range ifaces {
+			fmt.Fprintf(w, "%s\t%s\t\n", v.name, v.containingFile)
 			for _, m := range v.methods {
-				fmt.Printf("\t%s\n", m)
+				fmt.Fprintf(w, "\t\t%s\n", m)
 			}
 		}
+	case false:
+		fmt.Fprintf(w, "Interface\tContaining File\n\n")
+		for _, v := range ifaces {
+			fmt.Fprintf(w, "%s\t%s\t\n", v.name, v.containingFile)
+		}
 	}
+	w.Flush()
 }
 
 func searchInterfaces(exported bool) ([]IFace, error) {
