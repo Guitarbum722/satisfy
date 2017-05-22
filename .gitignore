@@ -26,5 +26,5 @@ _testmain.go
 satisfy
 sampler.go
 commands/sampler2.go
-
+.DS_Store
 debug
