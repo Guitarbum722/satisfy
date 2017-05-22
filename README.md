@@ -23,6 +23,8 @@ sampler2        commands/isearch_test.go
                                                 kick2() string
 ```
 
+![](https://github.com/Guitarbum722/satisfy/blob/master/assets/satisfy_all.gif)
+
 Search interfaces in current tree and only display exported interfaces
 ```sh
 $ satisfy isearch filter -e
