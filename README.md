@@ -37,6 +37,8 @@ Heater          commands/isearch_test.go
 IFacer          sampler.go
 ```
 
+![](https://github.com/Guitarbum722/satisfy/blob/master/assets/satisfy_filter_exportedonly.gif)
+
 Search all interfaces but do not display methods
 ```sh
 $ satisfy isearch filter
@@ -46,6 +48,9 @@ Interface       Containing File
 IFacer2         commands/isearch_test.go
 sampler2        commands/isearch_test.go
 ```
+
+![](https://github.com/Guitarbum722/satisfy/blob/master/assets/satisfy_filter_nomethods.gif)
+
 
 **Generate method signatures**
 
@@ -118,6 +123,8 @@ func (c *struct4) kick() {
 
 }
 ```
+
+![](https://github.com/Guitarbum722/satisfy/blob/master/assets/satisfy_implement.gif)
 
 ### Contributions
 Contributions are welcome!
